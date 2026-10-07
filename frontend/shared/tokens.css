@@ -1,0 +1,49 @@
+/* Hallmark · macrostructure: Workbench · tone: utilitarian · anchor hue: blue */
+/* pre-emit critique: P5 H4 E5 S4 R5 V5 */
+:root {
+  --color-paper: oklch(96% 0.01 100);
+  --color-paper-2: oklch(100% 0 0);
+  --color-ink: oklch(25% 0.02 260);
+  --color-muted: oklch(55% 0.02 260);
+  --color-line: oklch(90% 0.015 100);
+  --color-accent: oklch(55% 0.18 260);
+  --color-accent-ink: oklch(100% 0 0);
+  --color-success: oklch(55% 0.15 150);
+  --color-warn: oklch(65% 0.15 80);
+  --color-danger: oklch(55% 0.2 25);
+  --font-display: "Noto Serif SC", Georgia, serif;
+  --font-body: "Noto Sans SC", system-ui, sans-serif;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-3xl: 72px;
+  --radius: 12px;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 220ms;
+}
+
+html, body {
+  overflow-x: clip;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-style: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 150ms !important;
+  }
+}

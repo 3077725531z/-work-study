@@ -1,0 +1,10 @@
+/* Hallmark · employer-web Workbench/Garden · scoped tokens only, accent stays token-bound */
+.el-container {
+  background: var(--color-paper);
+}
+
+.el-main h2 {
+  font-family: var(--font-display);
+  font-style: normal;
+  margin: 0 0 var(--space-md);
+}

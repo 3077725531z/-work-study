@@ -1,0 +1,132 @@
+/* Hallmark · student-h5 Workbench/Cobalt · genre: modern-minimal
+ * pre-emit critique: P5 H4 E5 S4 R5 V5
+ * states: default · hover · focus-visible · active · disabled · loading · error · success
+ * contrast: pass
+ */
+
+/* Vant 主题映射到 Hallmark token：组件库颜色不再裸奔 */
+:root {
+  --van-primary-color: var(--color-accent);
+  --van-success-color: var(--color-success);
+  --van-danger-color: var(--color-danger);
+  --van-warning-color: var(--color-warn);
+  --van-text-color: var(--color-ink);
+  --van-text-color-2: var(--color-muted);
+  --van-border-color: var(--color-line);
+  --van-background: var(--color-paper);
+  --van-background-2: var(--color-paper-2);
+  --van-font-bold: 600;
+}
+
+.page {
+  padding: var(--space-md);
+  padding-bottom: calc(var(--space-xl) + 50px);
+  max-width: 560px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.page h2 {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-size: 22px;
+  margin: var(--space-md) 0 var(--space-sm);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.hero-card,
+.stat-card {
+  background: var(--color-ink);
+  color: var(--color-paper-2);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+.hero-card .sub,
+.stat-card .sub {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.card {
+  background: var(--color-paper-2);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+  min-width: 0;
+}
+
+.card .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.card .meta {
+  color: var(--color-muted);
+  font-size: 12px;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.pay {
+  color: var(--color-accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tip {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.err {
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.ok {
+  color: var(--color-success);
+  font-size: 13px;
+}
+
+/* 8 状态：交互元素全覆盖 */
+.van-button:hover {
+  filter: brightness(0.96);
+}
+
+.van-button:active {
+  transform: translateY(1px);
+}
+
+.van-button:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.van-button--disabled {
+  opacity: 0.55;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 414px) {
+  .page {
+    padding: var(--space-sm);
+    padding-bottom: calc(var(--space-xl) + 50px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 150ms !important;
+  }
+}

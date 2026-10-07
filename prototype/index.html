@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>勤工助学岗位管理系统 · 原型</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Hallmark · macrostructure: Workbench · tone: utilitarian · anchor hue: blue */
+:root{--nav-w:232px}
+*{box-sizing:border-box}body{margin:0;display:flex;min-height:100vh}
+aside{width:var(--nav-w);background:#111827;color:#E5E7EB;padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+aside h1{font-family:var(--font-display);font-size:19px;margin:4px 8px 2px}
+aside small{color:#9CA3AF;margin:0 8px 14px;display:block}
+.navbtn{display:block;width:100%;text-align:left;background:transparent;border:0;color:#D1D5DB;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px}
+.navbtn.active,.navbtn:hover{background:#1F2937;color:#fff}
+.role{margin:12px 8px 4px;font-size:12px;color:#9CA3AF}
+main{flex:1;padding:28px;max-width:1180px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.card{background:var(--color-paper-2);border:1px solid var(--color-line);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{font-size:30px;font-weight:800;font-family:var(--font-display)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border-bottom:1px solid var(--color-line);padding:10px 8px;text-align:left;overflow-wrap:anywhere}
+th{color:var(--color-muted);font-weight:600}
+.btn{background:var(--color-accent);color:var(--color-accent-ink);border:0;border-radius:10px;padding:9px 14px;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--color-ink);border:1px solid var(--color-line)}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid var(--color-line)}
+.b-green{color:var(--color-success);border-color:#BBF7D0;background:#F0FDF4}
+.b-amber{color:var(--color-warn);border-color:#FDE68A;background:#FFFBEB}
+.b-blue{color:var(--color-accent);border-color:#BFDBFE;background:#EFF6FF}
+.b-red{color:var(--color-danger);border-color:#FECACA;background:#FEF2F2}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--color-line);border-radius:10px;font-size:14px;background:#fff}
+label{font-size:13px;color:var(--color-muted)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.page{display:none}.page.show{display:block}
+:focus-visible{outline:3px solid #93C5FD;outline-offset:2px}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}body{flex-direction:column}aside{width:100%;height:auto;position:static}.row{grid-template-columns:1fr}}
+</style></head>
+<body>
+<aside>
+<h1>勤工助学管理</h1><small>Work-Study Prototype · v0.1</small>
+<div class="role">角色切换</div>
+<button class="navbtn" data-role="student">学生端</button>
+<button class="navbtn" data-role="employer">用工部门端</button>
+<button class="navbtn active" data-role="admin">管理员端</button>
+<div class="role">功能导航</div>
+<div id="nav"></div>
+</aside>
+<main>
+<div class="topbar"><div><b id="roleTitle">管理员工作台</b><div style="color:var(--color-muted);font-size:13px" id="roleDesc">岗位审核 · 考勤工资 · 公示与统计</div></div>
+<div><button class="btn ghost" onclick="alert('原型演示：已模拟登录')">已登录：管理员</button> <button class="btn" onclick="window.print()">导出/打印</button></div></div>
+<div id="app"></div>
+</main>
+<script>
+const jobs=[
+{id:'J01',title:'图书馆流通岗',dept:'图书馆',num:6,pay:'25元/小时',time:'周一至周五 18:00-21:00',addr:'图书馆一楼',status:'招募中',need:'责任心强，熟悉图书分类优先'},
+{id:'J02',title:'学院办公室助理',dept:'教务处',num:3,pay:'28元/小时',time:'工作日 14:00-17:00',addr:'行政楼302',status:'招募中',need:'熟练Office，保密意识强'},
+{id:'J03',title:'实验室助管',dept:'实验中心',num:4,pay:'30元/小时',time:'按实验排班',addr:'实验楼B区',status:'待审核',need:'理工科背景优先'},
+{id:'J04',title:'新媒体运营助理',dept:'宣传部',num:2,pay:'30元/小时',time:'弹性制',addr:'线上+线下',status:'已截止',need:'会剪辑/推文优先'}];
+const apps=[
+{id:'A1001',stu:'2022001 张晓',job:'图书馆流通岗',t:'2026-09-20',s:'待审核'},
+{id:'A1002',stu:'2022002 李晨',job:'学院办公室助理',t:'2026-09-21',s:'已通过'},
+{id:'A1003',stu:'2022003 王雨',job:'实验室助管',t:'2026-09-22',s:'待审核'}];
+let role='admin',page='dashboard';
+const navs={student:['岗位大厅','我的申请','我的考勤','我的工资','困难认定','通知公告'],employer:['岗位发布','申请审核','考勤登记','工时确认','部门评价'],admin:['总览','岗位审核','学生管理','申请管理','考勤工资','公示管理','统计报表']};
+const ids={student:['jobs','myapp','attend','salary','aid','notice'],employer:['pub','review','checkin','hours','eval'],admin:['dashboard','jobcheck','stus','appm','pay','pubm','report']};
+function renderNav(){const el=document.getElementById('nav');el.innerHTML='';navs[role].forEach((n,i)=>{const b=document.createElement('button');b.className='navbtn'+(ids[role][i]===page?' active':'');b.textContent=n;b.onclick=()=>{page=ids[role][i];renderNav();render()};el.appendChild(b)})}
+document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-role]').forEach(x=>x.classList.remove('active'));b.classList.add('active');role=b.dataset.role;page=ids[role][0];document.getElementById('roleTitle').textContent=b.textContent+'工作台';renderNav();render()});
+function badge(s){const m={'招募中':'b-green','待审核':'b-amber','已通过':'b-green','已截止':'b-red','待确认':'b-amber','已发放':'b-green','公示中':'b-blue'};return `<span class="badge ${m[s]||''}">${s}</span>`}
+function render(){const a=document.getElementById('app');let h='';
+if(page==='dashboard')h=`<div class="grid"><div class="card"><div class="stat">4</div>在招岗位</div><div class="card"><div class="stat">128</div>在岗学生</div><div class="card"><div class="stat">36</div>待审核申请</div><div class="card"><div class="stat">¥86,400</div>本月应发工资</div></div>
+<div class="card"><b>待办审核</b><table><tr><th>岗位</th><th>部门</th><th>人数</th><th>状态</th><th>操作</th></tr>${jobs.map(j=>`<tr><td>${j.title}</td><td>${j.dept}</td><td>${j.num}</td><td>${badge(j.status)}</td><td><button class="btn ghost">通过</button> <button class="btn ghost">驳回</button></td></tr>`).join('')}</table></div>`;
+else if(page==='jobs'||page==='pubm')h=`<div class="card"><b>岗位大厅（学生视角）</b> · 支持按部门/时间/薪资筛选<table><tr><th>岗位</th><th>部门</th><th>薪资</th><th>时间</th><th>状态</th><th>操作</th></tr>${jobs.map(j=>`<tr><td><b>${j.title}</b><br><small>${j.addr} · ${j.need}</small></td><td>${j.dept}</td><td>${j.pay}</td><td>${j.time}</td><td>${badge(j.status)}</td><td><button class="btn">申请</button></td></tr>`).join('')}</table></div>`;
+else if(page==='myapp'||page==='appm'||page==='review')h=`<div class="card"><b>申请管理</b><table><tr><th>编号</th><th>学生</th><th>岗位</th><th>时间</th><th>状态</th><th>操作</th></tr>${apps.map(x=>`<tr><td>${x.id}</td><td>${x.stu}</td><td>${x.job}</td><td>${x.t}</td><td>${badge(x.s)}</td><td><button class="btn ghost">通过</button> <button class="btn ghost">驳回</button></td></tr>`).join('')}</table></div>`;
+else if(page==='pay'||page==='salary'||page==='hours')h=`<div class="card"><b>考勤工资</b> · 考勤→工时→工资自动核算<table><tr><th>学生</th><th>岗位</th><th>本月工时</th><th>标准</th><th>应发</th><th>状态</th></tr><tr><td>张晓</td><td>图书馆流通岗</td><td>32h</td><td>25元/h</td><td>¥800</td><td>${badge('待确认')}</td></tr><tr><td>李晨</td><td>办公室助理</td><td>28h</td><td>28元/h</td><td>¥784</td><td>${badge('已发放')}</td></tr></table><p><button class="btn">一键核算</button> <button class="btn ghost">导出工资表</button></p></div>`;
+else if(page==='report')h=`<div class="card"><b>统计报表</b><div class="grid"><div class="card">岗位总数 24</div><div class="card">上岗人次 312</div><div class="card">发放总额 ¥212,000</div><div class="card">困难生占比 68%</div></div><p style="color:var(--color-muted)">原型：图表占位，后续接 ECharts（按月/按部门/按岗位类型统计）。</p></div>`;
+else if(page==='pub')h=`<div class="card"><b>岗位发布（用工部门）</b><div class="row"><div><label>岗位名称</label><input value="图书馆晚班助理"></div><div><label>需求人数</label><input value="6"></div></div><p><label>岗位描述</label><textarea>负责晚间流通、整理书架</textarea></p><button class="btn">提交审核</button></div>`;
+else h=`<div class="card"><b>功能占位：${page}</b><p style="color:var(--color-muted)">原型已覆盖核心流程：岗位发布→审核→学生申请→录用→考勤→工资→公示。此页为 ${page} 的表单/列表占位，可按同样表格规范扩展。</p></div>`;
+a.innerHTML=h}
+renderNav();render();
+</script></body></html>

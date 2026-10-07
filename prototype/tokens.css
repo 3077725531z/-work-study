@@ -1,0 +1,11 @@
+:root{
+--color-paper:#F7F5EF; --color-paper-2:#FFFFFF; --color-ink:#1A1C1E;
+--color-muted:#6B7280; --color-line:#E5E1D8; --color-accent:#1D4ED8;
+--color-accent-ink:#FFFFFF; --color-success:#15803D; --color-warn:#B45309; --color-danger:#B91C1C;
+--color-paper-dark:#111827;
+--font-display:"Noto Serif SC",Georgia,serif; --font-body:"Noto Sans SC",system-ui,sans-serif; --font-mono:ui-monospace,Menlo,monospace;
+--space-sm:8px; --space-md:16px; --space-lg:24px; --space-xl:40px; --space-3xl:72px;
+--radius:12px; --ease-out:cubic-bezier(.2,.7,.2,1); --dur:220ms;
+}
+*{box-sizing:border-box} html,body{overflow-x:clip}
+body{margin:0;font-family:var(--font-body);background:var(--color-paper);color:var(--color-ink)}

@@ -1,0 +1,25 @@
+# 依赖与构建产物（别传）
+node_modules/
+dist/
+*.log
+
+# 后端
+backend/target/
+backend/uploads/
+*.class
+
+# 上传文件与本地数据
+uploads/
+*.sql.bak
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# 环境变量（有密码别传）
+.env
+.env.local
+application-prod.yml

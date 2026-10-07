@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>学生端高保真原型 v2 · 按此实现</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{margin:0;font-family:var(--font-body);background:#EDE9E0;color:#1A1C1E}
+header{position:sticky;top:0;z-index:9;background:#111827;color:#fff;padding:12px 18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.board{display:flex;gap:26px;padding:26px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;height:900px;background:#fff;border-radius:44px;border:10px solid #111827;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.screen{flex:1;overflow-y:auto;padding:14px 14px 20px}
+.cap{max-width:390px;font-size:12.5px;color:#57534E;margin-top:8px;background:#fff;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px;line-height:1.7}
+.cap b{color:#111}.tag{display:inline-block;font-size:11px;background:#111827;color:#fff;border-radius:6px;padding:1px 7px;margin-right:6px}
+.st{font-family:var(--font-display);font-size:21px;font-weight:800;margin:6px 0}
+.sub{font-size:12px;color:#6B7280}.card{border:1px solid #E5E1D8;border-radius:14px;padding:12px;margin:10px 0}
+.kv{background:#F9FAFB;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.8}
+input,select,textarea{width:100%;padding:10px;border:1px solid #D6D0C2;border-radius:10px;font-size:14px;margin:5px 0;background:#fff;box-sizing:border-box}
+label{font-size:12px;color:#6B7280}.btn{background:#1D4ED8;color:#fff;border:0;border-radius:11px;padding:12px;width:100%;font-size:15px;margin-top:8px}.ghost{background:#fff;color:#111;border:1px solid #D6D0C2}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tabs{display:flex;gap:8px;margin:8px 0}.tab{flex:1;text-align:center;font-size:13px;padding:8px;border-radius:10px;background:#F3F4F6}.tab.on{background:#111827;color:#fff}
+.step{display:flex;gap:8px;font-size:12px;margin:8px 0}.dot{width:22px;height:22px;border-radius:50%;background:#1D4ED8;color:#fff;text-align:center;line-height:22px;flex-shrink:0}.dot.off{background:#D1D5DB}
+.tabbar{height:64px;border-top:1px solid #E5E1D8;display:flex;background:#fff;font-size:11px;color:#6B7280;flex-shrink:0}.tabbar div{flex:1;text-align:center;padding:9px 0}.on{color:#1D4ED8;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12.5px}td,th{border-bottom:1px solid #eee;padding:7px 4px;text-align:left}
+.err{color:#B91C1C;font-size:12px}.ok{color:#15803D;font-size:12px}
+.topnav{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:6px}.topnav span{color:#1D4ED8}
+</style></head>
+<body>
+<header><b>学生端高保真原型 v2 · 共14页 · 按此实现即可</b><span style="font-size:12px;color:#9CA3AF">缩放 <input id="z" type="range" min="35" max="110" value="70" style="width:140px"> <span id="zv">70%</span></span><span style="font-size:12px">字段名/规则/接口都标在每页下方说明卡，可直接照抄建表</span></header>
+<div class="board" id="board">
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 返回</span><b>P01 登录</b></div><div class="st">欢迎回来，同学</div><div class="sub">统一身份认证 · 学号登录 · 首次需绑定手机</div>
+<div class="card"><label>学号 * 10位数字</label><input id="sno" value="2022001234"><div class="err" id="e1"></div><label>密码 * 6-20位</label><input type="password" value="123456"><div class="row2"><button class="btn ghost">新生注册</button><button class="btn ghost">忘记密码</button></div><button class="btn" onclick="if(document.getElementById('sno').value.length!=10){document.getElementById('e1').textContent='学号必须为10位数字';}else{document.getElementById('e1').textContent='';alert('原型：校验通过 → 跳P02')}">登录</button><div class="ok">验证码失败3次后出现滑块验证（原型略）</div></div>
+<div class="kv">接口：POST /api/auth/login {sno,password}<br>成功→ token+role=student → 跳首页；失败→ 401 提示剩余次数</div>
+</div><div class="tabbar"><div>登录</div><div>注册</div><div>帮助</div></div></div><div class="cap"><span class="tag">P01</span><b>登录</b><br>字段：sno(10位),password。规则：学号正则 ^\d{10}$，密码6-20位，连续错5次锁定30min。表：users。忘记密码走“学号+身份证后6位+短信”重置。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P02 注册/完善信息</b></div><div class="st">新生注册</div>
+<label>学号*</label><input value="2023005678"><div class="row2"><div><label>姓名*</label><input value="张晓"></div><div><label>性别</label><select><option>男</option><option>女</option></select></div></div>
+<div class="row2"><div><label>学院*</label><select><option>信息学院</option><option>商学院</option><option>文学院</option></select></div><div><label>年级</label><select><option>大一</option><option>大二</option></select></div></div>
+<label>手机号*（收录用短信）</label><input value="13800001111"><label>银行卡号（发工资用，可后补）</label><input placeholder="6217…">
+<button class="btn">提交注册 → 待辅导员审核</button>
+</div><div class="tabbar"><div>登录</div><div class="on">注册</div><div>帮助</div></div></div><div class="cap"><span class="tag">P02</span><b>注册</b><br>字段：sno,name,gender,college,grade,phone,bank_card。规则：phone ^1[3-9]\d{9}$，bank luhn校验（可后补）。表 users(status=待审核)。审核通过才可登录申请岗位。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><b>P03 首页/岗位大厅</b><span style="margin-left:auto">🔔(3)</span></div>
+<div class="card" style="background:#111827;color:#fff">下午好，张晓 · 二档困难生优先推荐 <span class="ok" style="color:#86EFAC">3个匹配岗位</span></div>
+<input placeholder="搜索：图书馆 / 晚班 / 剪辑…">
+<div class="tabs"><div class="tab on">推荐</div><div class="tab">最新</div><div class="tab">高薪</div><div class="tab">离我近</div></div>
+<div class="tabs"><div class="tab on">全部</div><div class="tab">图书馆</div><div class="tab">行政</div><div class="tab">实验室</div></div>
+<div class="card"><b>图书馆流通岗 <span style="color:#1D4ED8">25元/h</span></b><div class="sub">图书馆 · 剩6/10 · 周一至五18-21点 · 包晚餐</div><div class="sub">标签：新生友好 · 室内 · 无需经验</div><button class="btn">查看详情 P04 ›</button></div>
+<div class="card"><b>办公室助理 <span style="color:#1D4ED8">28元/h</span></b><div class="sub">教务处 · 剩3/5 · 工作日14-17点</div><button class="btn ghost">查看详情 ›</button></div>
+<div class="card"><b>实验室助管 <span style="color:#1D4ED8">30元/h</span></b><div class="sub">实验中心 · 待上架（审核中）· 不可申请</div></div>
+</div><div class="tabbar"><div class="on">首页</div><div>申请</div><div>考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P03</span><b>首页</b><br>接口：GET /api/jobs?key=&dept=&sort=recommend&page=1。排序：recommend=困难档+空闲匹配+薪资综合。卡片字段：title,pay,dept,remain/total,time,tags。下拉刷新+上拉加载（page+1）。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 大厅</span><b>P04 岗位详情</b><span style="margin-left:auto">☆收藏</span></div><div class="st">图书馆流通岗</div><div class="sub">编号 J01 · 浏览 1,203 · 报名 18/10人</div>
+<div class="kv">薪资：25元/小时 · 月均约800元<br>时间：周一至五 18:00–21:00（3h/天，上限20h/周）<br>地点：图书馆一楼流通台（地图导航›）<br>内容：①借还办理 ②上架理架 ③晚间值班<br>要求：责任心强；新生可报；需参加1h岗前培训</div>
+<div class="card"><b>用工部门</b><div class="sub">图书馆流通部 · 王老师 62201111 · 好评率 98%</div></div>
+<div class="card"><b>常见问</b><div class="sub">Q考试周可请假吗？A提前3天请假，不计缺勤。<br>Q工资何时发？A次月10日前发上月。</div></div>
+<button class="btn">立即申请 → P05</button><button class="btn ghost">咨询老师（站内信）</button>
+</div><div class="tabbar"><div class="on">首页</div><div>申请</div><div>考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P04</span><b>详情</b><br>接口：GET /api/jobs/J01。报名满额/截止置灰不可点。每岗限申请1次（后端唯一约束 student_id+job_id）。收藏表 favorites。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 详情</span><b>P05 提交申请</b></div><div class="st">确认申请信息</div>
+<div class="kv">自动带入：张晓 · 2022001234 · 信息学院大二 · 手机138… · 二档困难生</div>
+<label>每周可到岗时段*（至少选2段）</label><div class="row2"><div><input type="checkbox" checked style="width:auto"> 周一晚</div><div><input type="checkbox" checked style="width:auto"> 周二晚</div></div><div class="row2"><div><input type="checkbox" style="width:auto"> 周三晚</div><div><input type="checkbox" style="width:auto"> 周四晚</div></div>
+<label>个人优势/备注（50字内）</label><textarea>做事细心，大一做过图书志愿者。</textarea>
+<label>上传附件（学生证/获奖，可选）</label><input type="file">
+<button class="btn" onclick="alert('提交成功 → 生成A1004待审核，跳P06')">提交申请</button><div class="sub">提交后不可修改，可撤回重提。接口 POST /api/applications {job_id,slots,remark}</div>
+</div><div class="tabbar"><div>首页</div><div class="on">申请</div><div>考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P05</span><b>申请表单</b><br>字段：job_id,available_slots[],remark,attach_url。规则：slots≥2，后端校验是否与课程冲突（课表接口），重复申请返回409。状态机：待审核→已通过/未通过→已撤回。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P06 我的申请</b></div><div class="tabs"><div class="tab on">全部3</div><div class="tab">待审1</div><div class="tab">已通过1</div><div class="tab">未通过1</div></div>
+<div class="card"><b>A1004 图书馆流通岗 · 待审核</b><div class="sub">09-20提交 · 预计3工作日内通知</div><div class="step"><span class="dot">1</span>提交 ✓ <span class="dot">2</span>部门初审(进行中) <span class="dot off">3</span>录用公示</div><div class="row2"><button class="btn ghost">撤回</button><button class="btn ghost">查看详情›</button></div></div>
+<div class="card"><b>A1002 办公室助理 · 已通过 🎉</b><div class="sub">培训：9-30 14:00 行政楼302（请带学生证）</div><button class="btn ghost">查看录用通知›</button></div>
+<div class="card"><b>A1001 实验室助管 · 未通过</b><div class="sub">原因：名额已满，建议报流通岗</div><button class="btn ghost">重新申请›</button></div>
+</div><div class="tabbar"><div>首页</div><div class="on">申请</div><div>考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P06</span><b>申请列表+时间线</b><br>接口：GET /api/applications?me&status=。时间线节点：submit→dept_review→publicity→onboard。每节点有operator+time+comment（表 application_logs）。撤回仅待审核可操作。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P07 考勤（日历+打卡）</b></div><div class="st">9月 · 正常12 · 迟到1 · 请假1</div>
+<table><tr><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr><tr><td>✓</td><td>✓</td><td>假</td><td>✓</td><td>迟</td><td>-</td><td>-</td></tr></table>
+<div class="kv">今日班次 流通岗 18:00–21:00<br>定位：需在图书馆50m内 · 时间±15min算正常</div>
+<button class="btn">上班打卡 17:52（定位✓）</button><button class="btn ghost">下班打卡（21:00后）</button>
+<div class="row2"><button class="btn ghost">请假申请›P08</button><button class="btn ghost">申诉›</button></div>
+<div class="sub">规则：迟到15-30min扣0.5h；缺勤3次取消资格。接口 POST /api/attendance/clock {type:in/out,lat,lng}</div>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div class="on">考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P07</span><b>考勤</b><br>表 attendances(id,student,job,date,clock_in/out,status)。打卡需同时传GPS+时间戳，后端算距离。日历色：绿正常/黄迟到/红缺勤/灰请假。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 考勤</span><b>P08 请假申请</b></div><label>请假类型*</label><select><option>事假</option><option>病假</option><option>考试周</option></select>
+<div class="row2"><div><label>开始*</label><input type="date" value="2026-09-25"></div><div><label>结束*</label><input type="date" value="2026-09-26"></div></div>
+<label>原因*（≥10字）</label><textarea>考试周复习，需请假两天，已和王老师沟通。</textarea>
+<label>证明（病假/考试需上传）</label><input type="file">
+<button class="btn">提交 → 待部门审批</button>
+<div class="card"><b>审批进度</b><div class="sub">辅导员 ✓ → 部门审批中 → 自动同步考勤为“请假”</div></div>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div class="on">考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P08</span><b>请假</b><br>表 leaves。规则：须提前24h（急病假除外），批准后对应考勤记leave不计缺勤。接口 POST /api/leaves。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P09 工资</b></div><div class="card" style="background:#111827;color:#fff"><div class="sub" style="color:#9CA3AF">9月应发（待确认）</div><div style="font-size:30px;font-weight:800">¥800.00</div><div class="sub" style="color:#9CA3AF">32h×25元 · 无扣款 · 银行卡尾号6632</div></div>
+<button class="btn">确认工时无误</button><div class="sub">确认后部门复核→财务发放；有误点申诉</div>
+<table><tr><th>月份</th><th>工时</th><th>金额</th><th>状态</th></tr><tr><td>9月</td><td>32h</td><td>800</td><td>待确认</td></tr><tr><td>8月</td><td>28h</td><td>784</td><td>已发放›明细</td></tr><tr><td>7月</td><td>24h</td><td>620</td><td>已发放›</td></tr></table>
+<button class="btn ghost">工资申诉›P10</button>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div>考勤</div><div class="on">工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P09</span><b>工资</b><br>表 salaries(month,hours,rate,gross,deduct,net,status,bank)。公式 net=hours×rate-deduct。流程：系统核算→学生确认→部门复核→财务发放。明细页需列每天工时清单。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 工资</span><b>P10 工资明细/申诉</b></div><div class="st">8月明细 ¥784</div>
+<table><tr><th>日期</th><th>班次</th><th>工时</th></tr><tr><td>08-20</td><td>18-21</td><td>3.0</td></tr><tr><td>08-21</td><td>18-21</td><td>2.8(迟到扣0.2)</td></tr></table>
+<div class="kv">扣款说明：迟到1次扣0.2h×28元=5.6元<br>发放：09-10 → 招商银行 6632（交易号…4412）</div>
+<label>申诉类型</label><select><option>工时有误</option><option>扣款有误</option><option>未到账</option></select>
+<textarea>08-21实际全勤，闸机记录可查，申请复核。</textarea>
+<button class="btn">提交申诉</button>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div>考勤</div><div class="on">工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P10</span><b>明细+申诉</b><br>表 appeals(salary_id,type,content,status)。申诉SLA：3工作日回复，申诉期间工资状态=冻结。需展示处理时间线。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P11 困难认定</b></div><div class="step"><span class="dot">1</span>申请 <span class="dot">2</span>辅导员初审✓ <span class="dot">3</span>学院复审(中) <span class="dot off">4</span>公示建档</div>
+<div class="card"><b>当前：二档（待终审）</b><div class="sub">一档4000/年 · 二档3000/年 · 三档2000/年（示意）</div></div>
+<label>家庭人均年收入*</label><input value="12000"><label>申请理由*（≥30字）</label><textarea>父母务农，弟弟在读高中，家庭负担重，申请二档助学金及岗位优先。</textarea>
+<div class="kv">材料 3/3 ✓ 身份证 ✓ 贫困证明 ✓ 承诺书<br><button class="btn ghost">补传材料</button></div>
+<button class="btn">重新提交/更新</button>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div>考勤</div><div>工资</div><div class="on">我的</div></div></div><div class="cap"><span class="tag">P11</span><b>困难认定</b><br>表 aid_applications(level,Income,reason,files,status)。材料走OSS上传，pdf/jpg≤5M。公示期5天，公示名单脱敏（张*晓）。认定结果影响岗位推荐权重。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P12 我的/资料</b></div><div class="kv">头像 · 张晓 · 2022001234<br>信息学院 · 大二 · 138****1111 · 招行6632<br>在岗：流通岗 · 累计工时 84h · 评价 4.9</div>
+<div class="tabs"><div class="tab on">资料</div><div class="tab">证书2</div><div class="tab">评价3</div></div>
+<div class="card"><b>部门评价</b><div class="sub">王老师 ★★★★★ “到岗准时，理架细心。”<br>教务处 ★★★★☆ “表格做得好。”</div></div>
+<div class="row2"><button class="btn ghost">编辑资料</button><button class="btn ghost">修改密码</button></div>
+<div class="row2"><button class="btn ghost">帮助中心</button><button class="btn ghost" style="color:#B91C1C">退出登录</button></div>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div>考勤</div><div>工资</div><div class="on">我的</div></div></div><div class="cap"><span class="tag">P12</span><b>我的</b><br>接口 GET /api/me，PUT /api/me（改手机/银行卡需短信验证）。评价表 reviews（仅部门可写，学生只读）。退出清token。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ </span><b>P13 消息/公示</b></div><div class="tabs"><div class="tab on">通知(3)</div><div class="tab">公示</div><div class="tab">站内信</div></div>
+<div class="card" style="border-left:4px solid #1D4ED8"><b>录用公示 第12期</b><div class="sub">流通岗拟录 张*晓、李*晨等6人，公示9.25-9.27，有异议请联系6220…</div><button class="btn ghost">查看完整名单› P14</button></div>
+<div class="card"><b>考勤提醒</b><div class="sub">今晚18:00班次，提前10分钟到岗。</div></div>
+<div class="card"><b>王老师站内信</b><div class="sub">明天培训带学生证。 ——1h前 [回复]</div></div>
+</div><div class="tabbar"><div class="on">首页</div><div>申请</div><div>考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P13</span><b>消息</b><br>表 notices/read_receipts。录用公示必须已读回执（“我已知晓”按钮），否则不可上岗打卡。站内信支持一问一答。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 通知</span><b>P14 公示详情</b></div><div class="st">第12期录用公示</div><div class="sub">公示期 2026-09-25 ~ 09-27 · 异议电话 62201111</div>
+<table><tr><th>岗位</th><th>拟录（脱敏）</th></tr><tr><td>流通岗</td><td>张*晓 李*晨 王*雨…共6人</td></tr><tr><td>办公室助理</td><td>赵*磊…共3人</td></tr></table>
+<div class="kv">公示规则：脱敏显示，公示期内可实名异议，逾期自动生效→生成在岗记录。</div>
+<button class="btn">我已知晓并同意</button><button class="btn ghost">实名异议</button>
+</div><div class="tabbar"><div class="on">首页</div><div>申请</div><div>考勤</div><div>工资</div><div>我的</div></div></div><div class="cap"><span class="tag">P14</span><b>公示详情</b><br>表 publicities。必须点“我已知晓”写read_receipts，否则P07不允许打卡。异议走工单 appeals(type=publicity)。</div></div>
+
+<div><div class="phone"><div class="screen">
+<div class="topnav"><span>‹ 我的</span><b>P15 我的课表（闭环核心）</b><span style="margin-left:auto" class="ok">已同步·教务</span></div>
+<div class="st">第6周课表 · 有课时段不可排班</div>
+<div class="tabs"><div class="tab on">周视图</div><div class="tab">列表</div></div>
+<table><tr><th></th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th></tr><tr><th>1-2</th><td style="background:#FEE2E2">有课</td><td></td><td style="background:#FEE2E2">有课</td><td></td><td></td></tr><tr><th>3-4</th><td style="background:#FEE2E2">有课</td><td style="background:#FEE2E2">有课</td><td></td><td></td><td style="background:#FEE2E2">有课</td></tr><tr><th>晚</th><td style="background:#DCFCE7">可排</td><td style="background:#DCFCE7">可排</td><td style="background:#FEE2E2">有课</td><td style="background:#DCFCE7">可排</td><td></td></tr></table>
+<div class="kv">同步方式：①教务一键同步（推荐）②截图导入 ③手动添加<br>上次同步：9-20 08:00 · 第6周生效中</div>
+<div class="row2"><button class="btn ghost">同步教务课表</button><button class="btn ghost">手动加一门</button></div>
+<div class="card"><b>闭环规则（全端生效）</b><div class="sub">1. P05申请时：所选到岗时段若与课表重叠→红字拦截“周三晚与《数据库》冲突”，不可提交<br>2. P03大厅：有课岗位卡置灰“与课表冲突”<br>3. 排班/考勤：有课时段不计缺勤，调班自动跳过有课人</div></div>
+<button class="btn">去申请岗位（自动过滤冲突）</button>
+</div><div class="tabbar"><div>首页</div><div>申请</div><div>考勤</div><div>工资</div><div class="on">我的</div></div></div><div class="cap"><span class="tag">P15</span><b>课表闭环</b><br>表 timetables(student_id,weekday,slot,course,semester,source)。接口 GET /api/timetable?me（教务同步），POST /api/timetable/manual。冲突判定函数 hasConflict(job_slots, timetable)：按 weekday+slot 交叉即冲突。P05/P03/E05/A05统一调此接口，论文第4章画“课表→申请→审核→排班”闭环图。</div></div>
+
+</div>
+<script>const z=document.getElementById('z'),zv=document.getElementById('zv'),b=document.getElementById('board');function f(){zv.textContent=z.value+'%';b.style.zoom=z.value+'%'}z.oninput=f;f();</script></body></html>

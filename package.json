@@ -1,0 +1,12 @@
+{
+  "name": "work-study-frontends",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix frontend/student-h5 install && npm --prefix frontend/admin-web install && npm --prefix frontend/employer-web install",
+    "dev": "concurrently -n student,admin,employer -c green,blue,magenta \"npm --prefix frontend/student-h5 run dev\" \"npm --prefix frontend/admin-web run dev\" \"npm --prefix frontend/employer-web run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

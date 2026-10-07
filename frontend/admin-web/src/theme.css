@@ -1,0 +1,14 @@
+/* Hallmark · admin-web Bento/Cobalt · scoped tokens only */
+.el-container {
+  background: var(--color-paper);
+}
+
+.el-aside {
+  padding: var(--space-md);
+}
+
+.el-main h2 {
+  font-family: var(--font-display);
+  font-style: normal;
+  margin: 0 0 var(--space-md);
+}
