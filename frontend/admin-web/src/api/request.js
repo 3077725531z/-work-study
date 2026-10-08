@@ -8,6 +8,18 @@ api.interceptors.request.use((c) => {
   return c
 })
 
-api.interceptors.response.use((res) => res.data.data ?? res.data)
+api.interceptors.response.use(
+  (res) => {
+    const d = res.data
+    if (d && d.code !== undefined && d.code !== 200) {
+      return Promise.reject(new Error(d.msg || '请求失败'))
+    }
+    return d.data ?? d
+  },
+  (err) => {
+    const msg = err.response?.data?.msg || err.message
+    return Promise.reject(new Error(msg))
+  }
+)
 
 export default api

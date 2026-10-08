@@ -1,6 +1,7 @@
 package cn.edu.modules.job.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -62,4 +63,8 @@ public class Job {
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
+
+    /** 在岗人数（非数据库字段，详情接口动态计算） */
+    @TableField(exist = false)
+    private Integer onboardCount;
 }

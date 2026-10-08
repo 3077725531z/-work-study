@@ -120,7 +120,7 @@ onMounted(async () => {
     const [j, p, t] = await Promise.all([
       jobOne(jobId()),
       api.get('/users', { params: { current: 1, size: 100 } }).catch(() => ({})),
-      myTimetable(uid()).catch(() => [])
+      myTimetable().catch(() => [])
     ])
     job.value = j
     options.value = parseSlots(j.recruitSlots || j.recruit_slots)

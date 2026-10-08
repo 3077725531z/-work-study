@@ -1,6 +1,7 @@
 package cn.edu.modules.attend.controller;
 
 import cn.edu.common.BizException;
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
 import cn.edu.modules.apply.entity.Application;
 import cn.edu.modules.apply.mapper.ApplicationMapper;
@@ -37,7 +38,8 @@ public class AttendanceController {
 
     @PostMapping("/clock")
     public Result<Attendance> clock(@RequestBody Map<String, Object> body) {
-        Long studentId = Long.valueOf(body.get("studentId").toString());
+        // 学生强制用登录 uid，防止替别人打卡
+        Long studentId = LoginUser.isStudent() ? LoginUser.getUid() : Long.valueOf(body.get("studentId").toString());
         Long jobId = Long.valueOf(body.get("jobId").toString());
 
         Long ok = applicationMapper.selectCount(

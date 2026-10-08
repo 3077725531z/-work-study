@@ -85,13 +85,10 @@ async function load() {
       current: 1,
       size: 20,
       key: (key.value || (cat.value === '全部' ? '' : cat.value)) || undefined,
-      status: status.value || undefined
+      status: status.value || undefined,
+      sort: sort.value
     })
-    let list = page.records ?? page ?? []
-    if (sort.value === 'pay') {
-      list = [...list].sort((a, b) => (b.payAmount ?? 0) - (a.payAmount ?? 0))
-    }
-    rows.value = list
+    rows.value = page.records ?? page ?? []
   } catch (e) {
     err.value = e.response?.data?.msg || e.message
   } finally {

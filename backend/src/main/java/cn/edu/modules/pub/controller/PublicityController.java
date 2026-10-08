@@ -1,5 +1,6 @@
 package cn.edu.modules.pub.controller;
 
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
 import cn.edu.modules.pub.entity.Publicity;
 import cn.edu.modules.pub.mapper.PublicityMapper;
@@ -35,8 +36,9 @@ public class PublicityController {
     @PostMapping("/{id}:read")
     public Result<Map<String, Object>> read(
             @PathVariable Long id,
-            @RequestParam Long studentId) {
+            @RequestParam(required = false) Long studentId) {
 
-        return Result.ok(Map.of("read", true));
+        Long uid = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+        return Result.ok(Map.of("read", true, "studentId", uid));
     }
 }

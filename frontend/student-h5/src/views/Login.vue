@@ -41,7 +41,8 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { login } from '../api'
 
-const sno = ref('2022001234')
+// 演示账号默认填充，正式上线前清空
+const sno = ref('2023307120')
 const password = ref('123456')
 const err = ref('')
 const busy = ref(false)

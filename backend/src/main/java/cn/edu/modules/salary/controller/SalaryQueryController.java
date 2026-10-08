@@ -1,13 +1,16 @@
 package cn.edu.modules.salary.controller;
 
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
+import cn.edu.modules.salary.entity.Salary;
 import cn.edu.modules.salary.mapper.SalaryMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 工资查询：A08 发放 / E08 复核列表
+ * 工资查询：学生看自己的 / 管理看全部
  */
 @RestController
 @RequestMapping("/api/salaries")
@@ -22,9 +25,11 @@ public class SalaryQueryController {
             @RequestParam(defaultValue = "20") long size,
             @RequestParam(required = false) Long studentId) {
 
-        var qw = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<cn.edu.modules.salary.entity.Salary>()
-                .eq(studentId != null, cn.edu.modules.salary.entity.Salary::getStudentId, studentId)
-                .orderByDesc(cn.edu.modules.salary.entity.Salary::getId);
+        Long filterId = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+
+        var qw = new LambdaQueryWrapper<Salary>()
+                .eq(filterId != null, Salary::getStudentId, filterId)
+                .orderByDesc(Salary::getId);
 
         return Result.ok(salaryMapper.selectPage(new Page<>(current, size), qw));
     }

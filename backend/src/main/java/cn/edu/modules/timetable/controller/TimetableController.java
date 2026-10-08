@@ -1,5 +1,6 @@
 package cn.edu.modules.timetable.controller;
 
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
 import cn.edu.modules.timetable.entity.Timetable;
 import cn.edu.modules.timetable.mapper.TimetableMapper;
@@ -25,20 +26,27 @@ public class TimetableController {
 
     @GetMapping
     public Result<List<Timetable>> list(
-            @RequestParam Long studentId,
-            @RequestParam String semester) {
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(defaultValue = "2026-秋") String semester) {
 
-        return Result.ok(timetableService.listOf(studentId, semester));
+        // 学生强制用自己的 uid
+        Long uid = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+        return Result.ok(timetableService.listOf(uid, semester));
     }
 
     @PostMapping
     public Result<Timetable> save(@RequestBody Timetable t) {
+        // 学生强制写入自己的 uid
+        if (LoginUser.isStudent()) {
+            t.setStudentId(LoginUser.getUid());
+        }
         timetableMapper.insert(t);
         return Result.ok(t);
     }
 
     @PostMapping("/sync")
-    public Result<Map<String, Object>> sync(@RequestParam Long studentId) {
-        return Result.ok(Map.of("synced", 6, "semester", "2026-秋"));
+    public Result<Map<String, Object>> sync(@RequestParam(required = false) Long studentId) {
+        Long uid = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+        return Result.ok(Map.of("synced", 6, "semester", "2026-秋", "studentId", uid));
     }
 }

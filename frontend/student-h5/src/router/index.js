@@ -16,7 +16,8 @@ const routes = [
   { path: '/me', component: () => import('../views/Me.vue'), meta: { title: 'P12 我的' } },
   { path: '/notices', component: () => import('../views/Notices.vue'), meta: { title: 'P13 消息' } },
   { path: '/pubs/:id', component: () => import('../views/PubDetail.vue'), meta: { title: 'P14 公示详情' } },
-  { path: '/timetable', component: () => import('../views/Timetable.vue'), meta: { title: 'P15 课表' } }
+  { path: '/timetable', component: () => import('../views/Timetable.vue'), meta: { title: 'P15 课表' } },
+  { path: '/:pathMatch(.*)*', component: () => import('../views/NotFound.vue'), meta: { title: '页面不存在', public: true } }
 ]
 
 const router = createRouter({
@@ -24,9 +25,9 @@ const router = createRouter({
   routes
 })
 
-// 未登录拦截：无 token 一律回登录页
+// 未登录拦截：无 token 或无 uid 一律回登录页
 router.beforeEach((to) => {
-  if (!to.meta.public && !localStorage.getItem('token')) {
+  if (!to.meta.public && (!localStorage.getItem('token') || !localStorage.getItem('uid'))) {
     return '/login'
   }
   document.title = `${to.meta.title || ''} · 勤工助学`

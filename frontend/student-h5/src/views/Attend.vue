@@ -30,6 +30,7 @@
       <p v-if="!canClock" class="tip">申请通过并经公示确认后，才会出现可打卡岗位</p>
     </section>
 
+    <p v-if="posText" class="pos">📍 当前定位：{{ posText }}</p>
     <p v-if="msg" class="ok">{{ msg }}</p>
     <p v-if="err" class="err">{{ err }}</p>
 
@@ -76,6 +77,7 @@ const showJobs = ref(false)
 const msg = ref('')
 const err = ref('')
 const busy = ref(false)
+const posText = ref('')
 
 const canClock = computed(() => !!jobId.value)
 const month = computed(() => {
@@ -164,6 +166,11 @@ async function doClock(type) {
         { timeout: 5000 }
       )
     })
+    if (pos.lat && pos.lng) {
+      posText.value = `${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)}`
+    } else {
+      posText.value = '定位失败（请允许浏览器定位权限）'
+    }
     const r = await clock({ studentId: uid(), jobId: jobId.value, type, ...pos })
     msg.value = `打卡成功 ${r.workDate ?? ''}`
     showToast('打卡成功')
@@ -195,6 +202,7 @@ onMounted(load)
 .onduty .sub { color: var(--color-muted); font-size: 12px; }
 .rec { display: flex; gap: 8px; align-items: center; background: var(--color-paper-2); border: 1px solid var(--color-line); border-radius: var(--radius); padding: 10px 12px; margin-top: 8px; }
 .rec .cf { margin-left: auto; color: var(--color-muted); font-size: 12px; }
+.pos { color: var(--color-muted); font-size: 12px; margin: 0; }
 .ok { color: var(--color-success); font-size: 13px; }
 .err { color: var(--color-danger); font-size: 13px; }
 .tip { color: var(--color-muted); font-size: 12px; margin: 0; }

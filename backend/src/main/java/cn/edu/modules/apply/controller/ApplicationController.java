@@ -1,5 +1,7 @@
 package cn.edu.modules.apply.controller;
 
+import cn.edu.common.BizException;
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
 import cn.edu.modules.apply.dto.ApplyRequest;
 import cn.edu.modules.apply.entity.Application;
@@ -24,12 +26,17 @@ public class ApplicationController {
 
     @PostMapping
     public Result<Application> submit(@Validated @RequestBody ApplyRequest req) {
+        // 学生强制用登录 uid，防止越权替别人申请
+        if (LoginUser.isStudent()) {
+            req.setStudentId(LoginUser.getUid());
+        }
         return Result.ok(applyService.submit(req));
     }
 
     @GetMapping
-    public Result<List<Application>> myList(@RequestParam Long studentId) {
-        return Result.ok(applyService.myList(studentId));
+    public Result<List<Application>> myList(@RequestParam(required = false) Long studentId) {
+        Long uid = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+        return Result.ok(applyService.myList(uid));
     }
 
     @PostMapping("/{id}:audit")
@@ -38,6 +45,13 @@ public class ApplicationController {
             @RequestParam boolean pass,
             @RequestParam(required = false) String comment) {
 
+        // 学生撤回（pass=false）时校验是自己的申请
+        if (LoginUser.isStudent() && !pass) {
+            Application app = applyService.getById(id);
+            if (app == null || !app.getStudentId().equals(LoginUser.getUid())) {
+                throw new BizException(403, "无权撤回他人申请");
+            }
+        }
         return Result.ok(applyService.audit(id, pass, comment));
     }
 

@@ -1,8 +1,10 @@
 package cn.edu.modules.notice.controller;
 
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
 import cn.edu.modules.notice.entity.Appeal;
 import cn.edu.modules.notice.mapper.AppealMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +25,11 @@ public class AppealController {
             @RequestParam(defaultValue = "20") long size,
             @RequestParam(required = false) Long studentId) {
 
-        var qw = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<cn.edu.modules.notice.entity.Appeal>()
-                .eq(studentId != null, cn.edu.modules.notice.entity.Appeal::getStudentId, studentId)
-                .orderByDesc(cn.edu.modules.notice.entity.Appeal::getId);
+        Long filterId = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+
+        var qw = new LambdaQueryWrapper<Appeal>()
+                .eq(filterId != null, Appeal::getStudentId, filterId)
+                .orderByDesc(Appeal::getId);
 
         return Result.ok(appealMapper.selectPage(new Page<>(current, size), qw));
     }

@@ -1,5 +1,6 @@
 package cn.edu.modules.aid.controller;
 
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
 import cn.edu.modules.aid.entity.AidApplication;
 import cn.edu.modules.aid.mapper.AidMapper;
@@ -19,6 +20,10 @@ public class AidController {
 
     @PostMapping
     public Result<AidApplication> apply(@RequestBody AidApplication a) {
+        // 学生强制用登录 uid
+        if (LoginUser.isStudent()) {
+            a.setStudentId(LoginUser.getUid());
+        }
         a.setStatus("待审核");
         aidMapper.insert(a);
         return Result.ok(a);

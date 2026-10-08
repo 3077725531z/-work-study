@@ -1,6 +1,9 @@
 package cn.edu.modules.salary.controller;
 
+import cn.edu.common.BizException;
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
+import cn.edu.modules.salary.entity.Salary;
 import cn.edu.modules.salary.mapper.SalaryMapper;
 import cn.edu.modules.salary.service.SalaryService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +36,12 @@ public class SalaryController {
 
     @PostMapping("/{id}:confirm")
     public Result<?> confirm(@PathVariable Long id) {
-        var s = salaryMapper.selectById(id);
+        Salary s = salaryMapper.selectById(id);
+        if (s == null) throw new BizException(404, "工资记录不存在");
+        // 学生只能确认自己的工资
+        if (LoginUser.isStudent() && !s.getStudentId().equals(LoginUser.getUid())) {
+            throw new BizException(403, "无权操作他人工资");
+        }
         s.setStatus("已复核");
         salaryMapper.updateById(s);
         return Result.ok();

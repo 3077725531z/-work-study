@@ -21,7 +21,7 @@
         v-for="p in filtered"
         :key="p.id"
         :class="['note', { seen: isRead(p.id) }]"
-        @click="$router.push(`/pubs/${p.id}`)"
+        @click="openDetail(p)"
       >
         <span :class="['dot', { on: !isRead(p.id) }]" />
         <div class="body">
@@ -43,7 +43,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { pubList } from '../api'
+import { useRouter } from 'vue-router'
+import { pubList, pubRead } from '../api'
+
+const router = useRouter()
 
 const rows = ref([])
 const tab = ref('')
@@ -56,6 +59,7 @@ const unread = computed(() => rows.value.filter((p) => !isRead(p.id)).length)
 
 const filtered = computed(() => {
   if (tab.value === 'unread') return rows.value.filter((p) => !isRead(p.id))
+  if (tab.value === 'pub') return rows.value
   return rows.value
 })
 
@@ -95,6 +99,17 @@ function flatten(c) {
     return Object.values(c).map(flatten).join('；')
   }
   return String(c ?? '')
+}
+
+async function openDetail(p) {
+  if (!isRead(p.id)) {
+    try {
+      await pubRead(p.id)
+      readIds.value.add(Number(p.id))
+      localStorage.setItem('read-pubs', JSON.stringify([...readIds.value]))
+    } catch { /* 后端可能是桩，忽略错误 */ }
+  }
+  router.push(`/pubs/${p.id}`)
 }
 
 async function reload() {

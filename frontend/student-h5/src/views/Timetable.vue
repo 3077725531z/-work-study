@@ -6,7 +6,10 @@
         <h2>先填课表，再申岗位</h2>
         <p class="sub">教务同步暂未对接，请手动填写；支持周次批量 · 在岗自动排入</p>
       </div>
-      <van-button size="small" round type="primary" @click="showAdd = true">+ 加课程</van-button>
+      <div class="hero-actions">
+        <van-button size="small" round plain @click="sync">教务同步</van-button>
+        <van-button size="small" round type="primary" @click="showAdd = true">+ 加课程</van-button>
+      </div>
     </header>
 
     <div class="legend">
@@ -151,7 +154,7 @@ async function load() {
     return
   }
   try {
-    rows.value = await myTimetable(uid())
+    rows.value = await myTimetable()
   } catch (e) {
     err.value = e.response?.data?.msg || e.message
   }
@@ -200,7 +203,8 @@ async function del(c) {
 
 async function sync() {
   try {
-    await syncTimetable(uid())
+    await syncTimetable()
+    showToast('教务同步完成（当前为预留接口，暂无真实数据）')
     await load()
   } catch (e) {
     err.value = e.response?.data?.msg || e.message
@@ -213,6 +217,7 @@ onMounted(load)
 <style scoped>
 .hallmark { padding: var(--space-md); padding-bottom: calc(var(--space-xl) + 50px); }
 .hero { background: var(--color-ink); color: var(--color-paper-2); border-radius: var(--radius); padding: var(--space-lg) var(--space-md); display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+.hero-actions { display: flex; gap: 6px; }
 .brand { display: inline-block; font-size: 12px; background: var(--color-accent); color: var(--color-accent-ink); border-radius: 999px; padding: 3px 10px; margin-bottom: var(--space-sm); }
 .hero h2 { font-family: var(--font-display); font-style: normal; font-size: 22px; margin: 0 0 4px; }
 .hero .sub { font-size: 12px; opacity: 0.75; margin: 0; }

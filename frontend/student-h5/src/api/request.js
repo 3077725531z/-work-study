@@ -27,7 +27,7 @@ api.interceptors.response.use(
     if (data && typeof data.code !== 'undefined' && data.code !== 200) {
       if (data.code === 401) {
         localStorage.clear()
-        window.location.hash = '#/login'
+        window.location.href = '/login'
       }
       return Promise.reject(toError(data))
     }
@@ -38,7 +38,7 @@ api.interceptors.response.use(
       showToast('网络异常，请检查后端是否启动')
     } else if (err.response.status === 401) {
       localStorage.clear()
-      window.location.hash = '#/login'
+      window.location.href = '/login'
     }
     return Promise.reject(err)
   }

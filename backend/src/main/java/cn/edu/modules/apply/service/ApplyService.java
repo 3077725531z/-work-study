@@ -150,6 +150,10 @@ public class ApplyService {
                         .orderByDesc(Application::getId));
     }
 
+    public Application getById(Long id) {
+        return applicationMapper.selectById(id);
+    }
+
     /**
      * slots 列是 JSON 类型，必须存 ["周一晚","周五晚"] 这种合法 JSON
      * 之前存逗号拼接串会导致 Invalid JSON text 而 500

@@ -1,13 +1,16 @@
 package cn.edu.modules.aid.controller;
 
+import cn.edu.common.LoginUser;
 import cn.edu.common.Result;
+import cn.edu.modules.aid.entity.AidApplication;
 import cn.edu.modules.aid.mapper.AidMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 认定查询：A06 复审列表
+ * 认定查询：学生看自己的 / 管理看全部
  */
 @RestController
 @RequestMapping("/api/aid")
@@ -22,9 +25,11 @@ public class AidQueryController {
             @RequestParam(defaultValue = "20") long size,
             @RequestParam(required = false) Long studentId) {
 
-        var qw = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<cn.edu.modules.aid.entity.AidApplication>()
-                .eq(studentId != null, cn.edu.modules.aid.entity.AidApplication::getStudentId, studentId)
-                .orderByDesc(cn.edu.modules.aid.entity.AidApplication::getId);
+        Long filterId = LoginUser.isStudent() ? LoginUser.getUid() : studentId;
+
+        var qw = new LambdaQueryWrapper<AidApplication>()
+                .eq(filterId != null, AidApplication::getStudentId, filterId)
+                .orderByDesc(AidApplication::getId);
 
         return Result.ok(aidMapper.selectPage(new Page<>(current, size), qw));
     }

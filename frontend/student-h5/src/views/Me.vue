@@ -41,26 +41,44 @@
     </van-cell-group>
 
     <van-cell-group inset class="hk-group grouped">
-      <van-cell title="修改密码" label="定期更换更安全" is-link @click="pwd" icon="lock" />
+      <van-cell title="修改密码" label="定期更换更安全" is-link @click="showPwd = true" icon="lock" />
       <van-cell title="退出登录" is-link @click="logout" icon="close" />
     </van-cell-group>
     <p v-if="err" class="err">{{ err }}</p>
+
+    <van-popup v-model:show="showPwd" position="bottom" round class="pwd-pop">
+      <div class="pwd-form">
+        <h3>修改密码</h3>
+        <van-field v-model="pwd.old" type="password" label="旧密码" placeholder="请输入当前密码" />
+        <van-field v-model="pwd.new" type="password" label="新密码" placeholder="6–20位" />
+        <van-field v-model="pwd.confirm" type="password" label="确认密码" placeholder="再输一次" />
+        <p v-if="pwdErr" class="err">{{ pwdErr }}</p>
+        <div class="pwd-btns">
+          <van-button round block @click="showPwd = false">取消</van-button>
+          <van-button round block type="primary" :loading="pwdBusy" @click="doPwd">确认修改</van-button>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast, showDialog } from 'vant'
+import { showToast } from 'vant'
 import api from '../api/request'
 import { myApplies, uid } from '../api'
 
 const me = ref({})
-const sno = ref(String(localStorage.getItem('uid') || ''))
+const sno = ref(String(localStorage.getItem('sno') || ''))
 const role = ref(localStorage.getItem('role') || 'student')
 const counts = ref({ applies: 0, attend: 0, pay: 0 })
 const err = ref('')
 const router = useRouter()
+const showPwd = ref(false)
+const pwd = ref({ old: '', new: '', confirm: '' })
+const pwdErr = ref('')
+const pwdBusy = ref(false)
 
 const roleText = computed(() => (role.value === 'student' ? '学生' : role.value))
 
@@ -69,12 +87,15 @@ async function loadMe() {
   try {
     const p = await api.get('/users', { params: { current: 1, size: 100 } })
     const list = p.records ?? p ?? []
+    // 只按 uid 或 sno 精确匹配，不做 role 兜底（避免拿到别人的档案）
     const mine =
       list.find((u) => String(u.id) === String(uid())) ||
       list.find((u) => String(u.sno) === sno.value) ||
-      list.find((u) => u.role === 'student')
+      null
     if (mine) {
       me.value = mine
+      // 同步刷新本地 sno
+      if (mine.sno) localStorage.setItem('sno', String(mine.sno))
     } else {
       err.value = '未找到你的档案，请联系辅导员确认学号'
     }
@@ -109,8 +130,36 @@ async function reload() {
   showToast('已同步数据库')
 }
 
-function pwd() {
-  showDialog({ title: '修改密码', message: '请联系辅导员重置，或在PC管理端修改' })
+async function doPwd() {
+  pwdErr.value = ''
+  if (!pwd.value.old) { pwdErr.value = '请输入旧密码'; return }
+  if (!pwd.value.new || pwd.value.new.length < 6 || pwd.value.new.length > 20) {
+    pwdErr.value = '新密码须为6–20位'
+    return
+  }
+  if (pwd.value.new !== pwd.value.confirm) {
+    pwdErr.value = '两次输入的新密码不一致'
+    return
+  }
+  if (pwd.value.new === pwd.value.old) {
+    pwdErr.value = '新密码不能与旧密码相同'
+    return
+  }
+  pwdBusy.value = true
+  try {
+    await api.put(`/users/${uid()}/password`, {
+      oldPassword: pwd.value.old,
+      newPassword: pwd.value.new
+    })
+    showToast('密码修改成功，请重新登录')
+    showPwd.value = false
+    pwd.value = { old: '', new: '', confirm: '' }
+    setTimeout(() => logout(), 800)
+  } catch (e) {
+    pwdErr.value = e.response?.data?.msg || e.message
+  } finally {
+    pwdBusy.value = false
+  }
 }
 
 function logout() {
@@ -141,4 +190,8 @@ onMounted(async () => {
 .hk-group { border: 1px solid var(--color-line); border-radius: var(--radius); overflow: hidden; }
 .grouped { margin-top: 12px; }
 .err { color: var(--color-danger); font-size: 13px; }
+.pwd-pop { max-width: 560px; }
+.pwd-form { padding: var(--space-md); display: grid; gap: var(--space-sm); }
+.pwd-form h3 { font-family: var(--font-display); margin: 0; font-size: 18px; }
+.pwd-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 </style>

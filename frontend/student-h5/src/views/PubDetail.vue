@@ -116,7 +116,7 @@ async function read() {
   }
   busy.value = true
   try {
-    await pubRead(route.params.id, uid())
+    await pubRead(route.params.id)
     const ids = new Set(JSON.parse(localStorage.getItem('read-pubs') || '[]'))
     ids.add(Number(route.params.id))
     localStorage.setItem('read-pubs', JSON.stringify([...ids]))
